@@ -4,6 +4,7 @@
 #include <time.h>
 #include <gmp.h>
 
+//bonjour
 //Attention : récursif risqué a cause du nombre d'appel de la fonction (empilement saturé)
 //donald knuth : the art of computer programming (analyse du nombre d'appel pour le pgcd en fonction de la taile de a et b)
 void pgcd(mpz_t gcd, mpz_t a, mpz_t b, int compteur){ //pour calculer le pgcd 
