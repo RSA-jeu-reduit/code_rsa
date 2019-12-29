@@ -23,6 +23,19 @@ void pgcd(mpz_t gcd, mpz_t a, mpz_t b, int compteur){ //pour calculer le pgcd
 	printf("compteur = %d\n",compteur);
 }
 
+void pgcd_it(mpz_t gcd, mpz_t a, mpz_t b)//version itérative
+{
+	mpz_t t,copiea,copieb;
+	mpz_inits(t,copiea,copieb,NULL);
+	do{
+		mpz_set(t,b);
+		mpz_mod(b,a,b);
+		mpz_set(a,t);
+	}while(mpz_cmp_ui(b,0)!=0);
+	mpz_set(gcd,a);
+	mpz_clears(t,copiea,copieb,NULL);
+}
+
 int AEE(mpz_t u, mpz_t v,mpz_t a, mpz_t n){
 	int compteur = 0;
 	mpz_t gcd;
@@ -48,6 +61,45 @@ int AEE(mpz_t u, mpz_t v,mpz_t a, mpz_t n){
 		mpz_sub(v,u1,tmp);
 	}
 	mpz_clears(a1,tmp,u1,NULL);
+	return 1;
+}
+
+int AEEit(mpz_t u, mpz_t v, mpz_t a, mpz_t b, mpz_t n)//version itérative
+{
+	mpz_t gcd;
+	mpz_init(gcd);
+	pgcd_it(gcd,a,n);
+	if(mpz_cmp_ui(gcd,1) != 0)
+	{
+		printf("élément non inversible !\n");
+		return 0;
+	}
+	mpz_t z,q,r,r1,u1,v1,tmp,tmp2,tmp3;
+	mpz_inits(z,q,r,r1,u1,v1,tmp,tmp2,tmp3,NULL);
+	mpz_set(r,a);
+	mpz_set_ui(u,1);
+	mpz_set_ui(v,0);
+	mpz_set(r1,b);
+	mpz_set_ui(u1,0);
+	mpz_set_ui(v1,1);
+	while(mpz_cmp_ui(r1,0)!=0)
+	{
+		mpz_cdiv_qr(q,z,r,r1);//z le reste non utilisé
+		gmp_printf("q = %Zu",q);
+		mpz_set(r,r1);
+		mpz_set(u,u1);
+		mpz_set(v,v1);
+		mpz_mul(tmp,q,r1);
+		mpz_sub(tmp,r,tmp);
+		mpz_set(r1,tmp);
+		mpz_mul(tmp2,q,u1);
+		mpz_sub(tmp2,u,tmp2);
+		mpz_set(u1,tmp2);
+		mpz_mul(tmp3,q,v1);
+		mpz_sub(tmp3,v,tmp3);
+		mpz_set(v1,tmp3);
+	}
+	mpz_clears(z,q,r,r1,u1,v1,tmp,tmp2,tmp3,NULL);
 	return 1;
 }
 
