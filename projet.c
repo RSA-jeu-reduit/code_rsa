@@ -110,12 +110,13 @@ void phi_n(mpz_t phi, mpz_t p, mpz_t q){
 	mpz_mul(phi,p_1,q_1);	
 }
 
-void genere_private_key(mpz_t d, mpz_t e, mpz_t phi){
+void genere_private_key(mpz_t d, mpz_t e, mpz_t phi,mpz_t n){
 	mpz_t v,u;
 	mpz_inits(v,u,NULL);
-	AEEit(u,v,d,e,phi);
+	AEEit(d,v,e,phi,n);
 	mpz_clears(v,u,NULL);
 }
+
 
 void generation_premier_valable(mpz_t p,mpz_t phip, gmp_randstate_t generateur, mpz_t e, unsigned int long taille_bit){
 	int est_premier,premier_entre_eux;
