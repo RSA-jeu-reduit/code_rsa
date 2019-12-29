@@ -20,7 +20,6 @@ void pgcd(mpz_t gcd, mpz_t a, mpz_t b, int compteur){ //pour calculer le pgcd
 		pgcd(gcd,copie_b,copie_a,compteur);
 	}
 	mpz_clears(copie_a,copie_b,NULL);
-	printf("compteur = %d\n",compteur);
 }
 
 void pgcd_it(mpz_t gcd, mpz_t a, mpz_t b)//version itérative
@@ -185,7 +184,7 @@ void joye_ladder(mpz_t m, mpz_t d, mpz_t n, mpz_t* tab){
 		mpz_mul(tab[1-bit_d],tab[1-bit_d],tab[bit_d]);
 		mpz_mod(tab[1-bit_d],tab[1-bit_d],n);
 	}
-	gmp_printf("%Zd\n",tab[0]);
+	//gmp_printf("%Zd\n",tab[0]);
 }
 
 int main(int argc, char* argv[]){
