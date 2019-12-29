@@ -110,11 +110,12 @@ void phi_n(mpz_t phi, mpz_t p, mpz_t q){
 	mpz_sub_ui(q_1,q,1);
 	mpz_mul(phi,p_1,q_1);	
 }
+
 void genere_private_key(mpz_t d, mpz_t e, mpz_t phi){
-	mpz_t v;
-	mpz_init(v);
-	AEE(d,v,e,phi);
-	mpz_clear(v);
+	mpz_t v,u;
+	mpz_inits(v,u,NULL);
+	AEEit(u,v,d,e,phi);
+	mpz_clears(v,u,NULL);
 }
 
 void generation_premier_valable(mpz_t p,mpz_t phip, gmp_randstate_t generateur, mpz_t e, unsigned int long taille_bit){
@@ -198,7 +199,7 @@ int main(int argc, char* argv[]){
 	gmp_printf("m^d = %Zx\n",tab[0]);
 	mpz_powm(m,m,d,n);
 	gmp_printf("m^d = %Zx\n",m);
-	pgcd(gcd,n,e);
+	pgcd_it(gcd,n,e);
 
 	/*mpz_t a,inv_a,n,v,gcd;
 	mpz_inits(a,inv_a,n,v,gcd,NULL);
