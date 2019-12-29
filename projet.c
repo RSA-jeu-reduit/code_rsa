@@ -200,6 +200,21 @@ int main(int argc, char* argv[]){
 	gmp_printf("m^d = %Zx\n",m);
 	pgcd_it(gcd,n,e);
 
+	//calcul du chiffré m^e[n]
+	mpz_t c,m2;
+	mpz_inits(c,m2,NULL);
+	mpz_powm(c,m,e,n);
+	gmp_printf("m^e = %Zx\n",c);
+	joye_ladder(c,m,e,tab);
+	gmp_printf("m^e = %Zx\n",c);
+
+	//calcul du clair c^d[n]
+	mpz_powm(m2,c,d,n);
+	gmp_printf("c^d = %Zx\n",m2);
+	joye_ladder(m2,c,d,tab);
+	gmp_printf("c^d = %Zx\n",m2);
+	
+	
 	/*mpz_t a,inv_a,n,v,gcd;
 	mpz_inits(a,inv_a,n,v,gcd,NULL);
 	mpz_set_ui(n,228);
@@ -214,5 +229,5 @@ int main(int argc, char* argv[]){
 	//AEE(inv_a,v,a,n);
 	//gmp_printf("inv_a = %Zd\n a = %Zd\n",inv_a,a,n);
 	//mpz_clears(a,inv_a,n,v,NULL);
-	mpz_clears(e,d,n,tab[0],tab[1],m,gcd,NULL);
+	mpz_clears(e,d,c,m2,n,tab[0],tab[1],m,gcd,NULL);
 }
