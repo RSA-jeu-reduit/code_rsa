@@ -20,5 +20,30 @@ void verif_sign(mpz_t verif_sig, mpz_t m, mpz_t sig, mpz_t e, mpz_t n)//verif_si
 
 //////////////////////////////////////////////// à rajouter dans le main/////////////////////////////////////////
 
+	mpz_t n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig;
+	gmp_randstate_t generateur;
+	gmp_randinit_default(generateur);//initialisation du generateur
+	gmp_randseed_ui(generateur,time(NULL));
+	mpz_inits(n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig,NULL);
+	mpz_set_ui(e,3);
+	mpz_set_str(m,"23457843567",10);
+	gmp_printf("m = 0x%Zx\n\n",m);
+	generation_RSA_CRT(n,e,d_p,d_q,I_p,p,q,512);
+	encrypt_rsa(c,m,e,n);
+	decrypt_rsa_CRT(m_obtenu,c,d_p,d_q,I_p,p,q);
+	est_egale(m,m_obtenu);
+	/*generation_RSA(n,e,d,2048);
+	mpz_set_str(m,"23457843567",10);
+	gmp_printf("m = 0x%Zx\n\n",m);
+	encrypt_rsa(c,m,e,n);
+	decrypt_rsa(m_obtenu,c,d,n);
+	est_egale(m,m_obtenu);*/
+
 	sign(sig,m,d,n);
 	verif_sign(verif_sig,m,sig,e,n);
+
+	gmp_randclear(generateur);
+	mpz_clears(n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig,NULL);
+
+
+	return 0;
