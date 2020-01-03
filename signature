@@ -1,0 +1,24 @@
+void sign(mpz_t sig, mpz_t m, mpz_t d, mpz_t n)//sig=m^d (mod n)
+{
+	joye_ladder(sig,m,d,n);
+	gmp_printf("signature = 0x%Zd\n", sig);
+}
+
+void verif_sign(mpz_t verif_sig, mpz_t m, mpz_t sig, mpz_t e, mpz_t n)//verif_sig = sig^e (mod n) = m
+{
+	joye_ladder(verif_sig,sig,e,n);
+	if(mpz_cmp(verif_sig,m)==0)
+	{
+		gmp_printf("La signature est valide, on obtient verif_sig = 0x%Zd qui est égal à m\n",verif_sig);
+	}
+	else
+	{
+		printf("problème dans la vérification de signature\n");
+		gmp_printf("verif_sig = 0x%Zd",verif_sig);
+	}
+}
+
+//////////////////////////////////////////////// à rajouter dans le main/////////////////////////////////////////
+
+	sign(sig,m,d,n);
+	verif_sign(verif_sig,m,sig,e,n);
