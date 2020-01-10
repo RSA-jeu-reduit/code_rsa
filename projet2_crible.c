@@ -5,7 +5,7 @@
 #include <string.h>
 #include "gmp.h"
 
-void pgcd_it(mpz_t gcd, mpz_t a, mpz_t b)//version itérative
+void pgcd_it(mpz_t gcd, mpz_t a, mpz_t b)//version itérative !!!!!!!!
 {
 	mpz_t t,copie_a,copie_b;
 	mpz_inits(t,copie_a,copie_b,NULL);
@@ -141,77 +141,157 @@ void est_egale(mpz_t m,mpz_t m_obtenu){
 	}
 }
 
-void generation_premier_valable(mpz_t p,mpz_t phip, gmp_randstate_t generateur, mpz_t e, unsigned int long taille_bit){
+unsigned long int* k_plus_petit_premier(int k){
+	mpz_t z_p,z_next;
+	unsigned long int* tab = NULL;
+	mpz_inits(z_p,z_next,NULL);
+	tab = malloc(sizeof(unsigned long int)*k);
+	tab[0] = 2;
+	mpz_set_ui(z_p,2);
+	for(int i = 1; i < k; i++){
+		mpz_nextprime(z_next,z_p);
+		tab[i] = mpz_get_ui(z_next);
+		mpz_set(z_p,z_next);
+	}
+	return tab;
+	mpz_clears(z_p,z_next,NULL);
+	free(tab);
+}
+
+int residus_nuls(mpz_t* tab_residus,int k){
+	for (int i = 0; i < k-1; i++){
+		if (tab_residus[i] == 0){
+			return 1;
+		}
+	}
+	return 0;	
+}
+
+void crible_opti(mpz_t q, unsigned int b, int k, unsigned long int* tab){
+	//mpz_set_ui(q,0);
+	mpz_t z_residus;
+	mpz_t* tab_residus;
+	int trouve = 0;
+	int div = 0; // = à 1 si au moins un résidu du tableau est nul (donc q divisible et non premier), 0 sinon
+	int j;
+
+	mpz_init(z_residus);
+	tab_residus = (mpz_t*) malloc((k-1)*sizeof(mpz_t));
+
+	for (j = 0; j< k-1; j++){
+		mpz_init(tab_residus[j]);
+		mpz_mod_ui(tab_residus[j],q,tab[j+1]);
+		if (tab_residus[j] == 0){
+			div = 1;
+		}
+	}
+
+	while(!trouve){
+		while(div){
+			for(j = 1; j < k ; j++){
+				mpz_add_ui(tab_residus[j-1],tab_residus[j-1],2);
+				mpz_mod_ui(tab_residus[j-1],tab_residus[j-1],tab[j]);
+			}
+			mpz_add_ui(q,q,2);
+			div = residus_nuls(tab_residus,k);
+		}
+		if(test_miller_rabin(q,3) == 0){ // si q est quand même composé
+			for (j = 1; j < k ; j++){
+				mpz_add_ui(tab_residus[j-1],tab_residus[j-1],2);
+				mpz_mod_ui(tab_residus[j-1],tab_residus[j-1],tab[j]);
+			}
+			mpz_add_ui(q,q,2);
+		}
+		else{
+			trouve = 1;
+		}
+	}
+	//system("clear");
+	mpz_clears(z_residus,NULL);
+	for(j = 0; j < k-1; j++){
+    	mpz_clear(tab_residus[j]);
+    }
+    free(tab_residus);
+}
+
+void generation_premier_valable(mpz_t p,mpz_t phip, gmp_randstate_t generateur, mpz_t e, unsigned int long taille_bit, int k, unsigned long int* tab){
 	mpz_t gcd;
 	mpz_init(gcd);
-	//printf("io");
+
 	do{
 		mpz_urandomb(p,generateur,taille_bit);
-		mpz_sub_ui(phip,p,1); 
+
+		mpz_setbit(p,taille_bit - 1); //le forcer a être de taille b
+		mpz_setbit(p,0);//le forcer à être impaire 
+
+    	crible_opti(p,taille_bit,k,tab);
+
+		mpz_sub_ui(phip,p,1);
+
 		pgcd_it(gcd,e,phip);
-	}while(mpz_cmp_ui(gcd,1) != 0 || test_miller_rabin(p,3) == 0);
+	}while(mpz_cmp_ui(gcd,1) != 0);
 	mpz_clear(gcd);
 }
 
-void generation_RSA(mpz_t n, mpz_t z_e,mpz_t d,unsigned long int k){
-	mpz_t p,q,phip,phiq,phi;
+void generation_RSA(mpz_t n, mpz_t e, mpz_t d, int taille_bit){
+	int k = 30;
+	mpz_t p,q,phi,phip,phiq;
+	mpz_inits(p,q,phi,phip,phiq,NULL);
 	gmp_randstate_t generateur;
-	unsigned long int taille_bit;
-	mpz_inits(p,q,phip,phiq,phi,NULL);
 	gmp_randinit_default(generateur);
 	gmp_randseed_ui(generateur,time(NULL));
-		do{ 
-		if (k%2 == 0){//distinction des cas où k est pair ou impair
-			generation_premier_valable(p,phip,generateur,z_e,k/2);
-			generation_premier_valable(q,phiq,generateur,z_e,k/2);
-		}
-		else{
-			generation_premier_valable(p,phip,generateur,z_e,k/2 + 1);
-			generation_premier_valable(q,phiq,generateur,z_e,k/2);
+	unsigned long int* tab = NULL;
+	tab = k_plus_petit_premier(k);
+	do{
+		if(taille_bit%2 == 1){
+			generation_premier_valable(p,phip,generateur,e,taille_bit/2,k,tab);
+			generation_premier_valable(q,phiq,generateur,e,taille_bit/2 + 1,k,tab);
+		}else{
+			generation_premier_valable(p,phip,generateur,e,taille_bit/2,k,tab);
+			generation_premier_valable(q,phiq,generateur,e,taille_bit/2,k,tab);
 		}
 		mpz_mul(n,p,q);
-		taille_bit = mpz_sizeinbase(n,2);
-	}while (taille_bit != k);
-	//gmp_printf("phip = %Zu\nphiq = %Zu\n\n",phip,phiq);
-	//gmp_printf("p = %Zu\nq = %Zu\n\n",p,q);
-	//gmp_printf("n = 0x%Zx\n\n",n);
-	//gmp_printf("e = 0x%Zx\n\n",z_e);
-
+	}while(mpz_sizeinbase(n,2)!=taille_bit);
+	//gmp_printf("p = %Zd\n\n",p);
+	//printf("%d\n",mpz_probab_prime_p(p,3));
+	//gmp_printf("q = %Zd\n\n",q);
+	//printf("%d\n",mpz_probab_prime_p(q,3));
 	//calcul de d = inv(e) mod phi
 	mpz_mul(phi,phip,phiq);
-	invert(d,z_e,phi);
+	mpz_invert(d,e,phi);
 	//mpz_mod(d,d,phi);
 	//gmp_printf("d = 0x%Zx\n\n",d);
-	mpz_clears(p,q,phip,phiq,phi,NULL);
+	mpz_inits(p,q,phi,phip,phiq,NULL);
 	gmp_randclear(generateur);
 }
 
-void generation_RSA_CRT(mpz_t n, mpz_t z_e, mpz_t d_p, mpz_t d_q, mpz_t I_p, mpz_t p, mpz_t q, unsigned long int k){
-	mpz_t phip,phiq,phi;
+void generation_RSA_CRT(mpz_t n, mpz_t e, mpz_t d_p, mpz_t d_q, mpz_t I_p, mpz_t p, mpz_t q, unsigned long int taille_bit){
+	int k = 30;
+	mpz_t phi,phip,phiq;
+	mpz_inits(phi,phip,phiq,NULL);
 	gmp_randstate_t generateur;
-	unsigned long int taille_bit;
-	mpz_inits(phip,phiq,phi,NULL);
-	gmp_randinit_default(generateur);//initialisation du generateur
+	gmp_randinit_default(generateur);
 	gmp_randseed_ui(generateur,time(NULL));
-		do{
-		if (k%2 == 0){
-			generation_premier_valable(p,phip,generateur,z_e,k/2);
-			generation_premier_valable(q,phiq,generateur,z_e,k/2);
-		}
-		else{
-			generation_premier_valable(p,phip,generateur,z_e,k/2 + 1);
-			generation_premier_valable(q,phiq,generateur,z_e,k/2);
+	unsigned long int* tab = NULL;
+	tab = k_plus_petit_premier(k);
+	do{
+		if(taille_bit%2 == 1){
+			generation_premier_valable(p,phip,generateur,e,taille_bit/2,k,tab);
+			generation_premier_valable(q,phiq,generateur,e,taille_bit/2 + 1,k,tab);
+		}else{
+			generation_premier_valable(p,phip,generateur,e,taille_bit/2,k,tab);
+			generation_premier_valable(q,phiq,generateur,e,taille_bit/2,k,tab);
 		}
 		mpz_mul(n,p,q);
-		taille_bit = mpz_sizeinbase(n,2);
-	}while (taille_bit != k);
-	invert(d_p,z_e,phip);
-	invert(d_q,z_e,phiq);
+	}while(mpz_sizeinbase(n,2)!=taille_bit);
+
+	invert(d_p,e,phip);
+	invert(d_q,e,phiq);
 	invert(I_p,p,q);
-	/*gmp_printf("p = %Zu\nq = %Zu\n\n",p,q);
+	gmp_printf("p = %Zu\nq = %Zu\n\n",p,q);
 	gmp_printf("n = 0x%Zx\n\n",n);
 	gmp_printf("d_p = 0x%Zx\nd_q = %Zu\n\n",d_p,d_q);
-	gmp_printf("I_p = 0x%Zx\n\n",I_p);*/
+	gmp_printf("I_p = 0x%Zx\n\n",I_p);
 	mpz_clears(phip,phiq,phi,NULL);
 }
 
@@ -252,7 +332,7 @@ void verif_sign(mpz_t verif_sig, mpz_t m, mpz_t sig, mpz_t e, mpz_t n)//verif_si
 	joye_ladder(verif_sig,sig,e,n);
 	if(mpz_cmp(verif_sig,m)==0)
 	{
-		gmp_printf("La signature est valide, on obtient verif_sig = 0x%Zx qui est égal à m\n",verif_sig);
+		gmp_printf("La signature est valide, on obtient verif_sig = 0x%Zd qui est égal à m\n",verif_sig);
 	}
 	else
 	{
@@ -278,42 +358,66 @@ void sign_CRT(mpz_t sig_CRT, mpz_t m, mpz_t p, mpz_t q, mpz_t d_p, mpz_t d_q,mpz
 	mpz_clears(m_p,m_q,s_p,s_q,NULL);
 }
 
+
 int main(int argc, char* argv[]){
-	int i;
-	mpz_t n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig;
-	gmp_randstate_t generateur;
-	gmp_randinit_default(generateur);//initialisation du generateur
-	gmp_randseed_ui(generateur,time(NULL));
-	mpz_inits(n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,NULL);
+	//int i;
+	long unsigned int taille_bit = 1024; 
+	//int k = 30;
+	//unsigned long int* tab = NULL;
+	//tab = k_plus_petit_premier(k);
+	mpz_t n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig,phip,phiq,phi;
+	mpz_inits(n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig,phip,phiq,phi,NULL);
 	mpz_set_ui(e,65537);
-	//mpz_set_str(m,"234578435679875467896755435654787687845676743647",10);
-	//gmp_printf("m = 0x%Zx\n\n",m);
-	//generation_RSA_CRT(n,e,d_p,d_q,I_p,p,q,1024);
-	//encrypt_rsa(c,m,e,n);
-	//decrypt_rsa_CRT(m_obtenu,c,d_p,d_q,I_p,p,q);
-	//est_egale(m,m_obtenu);
-	//sign(sig,m,d,n);
-	FILE* fichier;
-	fichier = fopen("timing_projet2.txt","w");
+	//gmp_printf("%Zd",e);
+	/*FILE* fichier;
+	fichier = fopen("timing_projet2_crible.txt","w");
 	clock_t start,end;
 	double cpu_time_used;
-	for (i = 0; i < 100; i++){
+	for (int i = 0; i < 100; i++){
 		start = clock();
-		generation_RSA(n,e,d,1024);
+		generation_RSA(n,e,d,taille_bit);
 		end = clock();
 		cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     	fprintf(fichier,"%d %f\n",i,cpu_time_used);
 		printf("%d\n",i);
-	}
-	/*generation_RSA(n,e,d,1024);
+	}*/
+	mpz_set_str(m,"234578435679875467896755435654787687845676743647",10);
+	gmp_printf("m = 0x%Zx\n\n",m);
+	generation_RSA_CRT(n,e,d_p,d_q,I_p,p,q,1024);
+	encrypt_rsa(c,m,e,n);
+	decrypt_rsa_CRT(m_obtenu,c,d_p,d_q,I_p,p,q);
+	est_egale(m,m_obtenu);
+	sign_CRT(sig,m,p,q,d_p,d_q,I_p,n);
+	verif_sign(verif_sig,m,sig,e,n);
+	//sign(sig,m,d,n);
+	/*gmp_randstate_t generateur;
+	gmp_randinit_default(generateur);
+	gmp_randseed_ui(generateur,time(NULL));
+	do{
+		generation_premier_valable(p,phip,generateur,e,taille_bit/2,k,tab);
+		generation_premier_valable(q,phiq,generateur,e,taille_bit/2 + 1,k,tab);
+		mpz_mul(n,p,q);
+	}while(mpz_sizeinbase(n,2)!=taille_bit);
+
+	gmp_printf("p = %Zd\n\n",p);
+	printf("%d\n",mpz_probab_prime_p(p,3));
+	gmp_printf("q = %Zd\n\n",q);
+	printf("%d\n",mpz_probab_prime_p(q,3));
+	//calcul de d = inv(e) mod phi
+	mpz_mul(phi,phip,phiq);
+	mpz_invert(d,e,phi);
+	//mpz_mod(d,d,phi);
+	gmp_printf("d = 0x%Zx\n\n",d);
+	//generation_RSA(n,e,d,taille_bit);
+	//printf("ok\n");
 	mpz_set_str(m,"234578435679875467896755435654787687845676743647",10);
 	gmp_printf("m = 0x%Zx\n\n",m);
 	encrypt_rsa(c,m,e,n);
 	decrypt_rsa(m_obtenu,c,d,n);
 	est_egale(m,m_obtenu);*/
 	//sign(sig,m,d,n);
-	gmp_randclear(generateur);
-	mpz_clears(n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,NULL);
+
+	mpz_clears(n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig,phip,phiq,phi,NULL);
 
 
 	return 0;
