@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -5,8 +6,6 @@
 #include <string.h>
 #include "gmp.h"
 
-unsigned int tab[25] = //tableau contenu les 25 premiers nombres premiers
-{ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97};
 
 
 void pgcd_it(mpz_t gcd, mpz_t a, mpz_t b)//version itérative
@@ -219,7 +218,7 @@ void generation_premier_valable(mpz_t p,mpz_t phip, gmp_randstate_t generateur, 
 		mpz_urandomb(p,generateur,taille_bit);
 
 		mpz_setbit(p,taille_bit - 1); //le forcer a être de taille b
-		mpz_setbit(p,0);//le forcer à être impaire 
+		mpz_setbit(p,0);//le forcer à être impair
 
     	crible_opti(p,taille_bit,k,tab);
 
@@ -343,7 +342,7 @@ void sign_CRT(mpz_t sig_CRT, mpz_t m, mpz_t p, mpz_t q, mpz_t d_p, mpz_t d_q,mpz
 void messageATraiter(mpz_t m)
 {
 	int message;
-	printf("Entrez le message à chiffrer ou signer en chiffres compris entre 0 et 9\n\n");
+	printf("Entrez le message à chiffrer ou signer\n\n");
 	scanf("%d",&message);
 	mpz_set_ui(m,message);
 	printf("\n");
@@ -354,22 +353,25 @@ void messageATraiter(mpz_t m)
 int taille_N()
 {
 		int Tn_int;
-		printf("donnez la taille voulue pour n conseillée entre 1024 et 2048\n\n");
+		printf("Donnez la taille voulue pour N conseillée entre 1024 et 2048\n\n");
 		scanf("%d",&Tn_int);
 		printf("\n");
 		if(Tn_int<=0)
 		{
-			printf("erreur saisie la taille sera 1024\n\n");
+			printf("Erreur de saisie la taille sera 1024\n\n");
 			Tn_int = 1024;
 		}
 		else
 		{
-			printf("taille de n = %d\n\n",Tn_int);
+			printf("Taille de N = %d\n\n",Tn_int);
 		}
 		return Tn_int;
 }
 
 int main(int argc, char* argv[]){
+	unsigned int tab[25] = //tableau contenu les 25 premiers nombres premiers
+	{ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97};
+
 	int k = sizeof(tab)/sizeof(unsigned int);
 	mpz_t n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig;
 	mpz_inits(n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig,NULL);
@@ -387,25 +389,25 @@ int main(int argc, char* argv[]){
 		case 1: generation_RSA(n,e,d,taille_bit,tab,k);
 				joye_ladder(c,m,e,n);
 				joye_ladder(m_obtenu,c,d,n);
-				gmp_printf("cypher_text = %Zx\n\nexposant publique = %Zx\n\nmodulo (N) = %Zx\n\n",c,e,n);
+				gmp_printf("Cypher_text = %Zx\n\nE : exposant publique = %Zx\n\nN = %Zx\n\n",c,e,n);
 				est_egale(m,m_obtenu);
 				break;
 		case 2: generation_RSA_CRT(n,e,d_p,d_q,I_p,p,q,taille_bit,tab,k);
 				joye_ladder(c,m,e,n);
 				decrypt_rsa_CRT(m_obtenu,c,d_p,d_q,I_p,p,q);
-				gmp_printf("cypher_text = %Zx\n\nexposant publique = %Zx\n\nmodulo (N) = %Zx\n\n",c,e,n);
+				gmp_printf("Cypher_text = %Zx\n\nE : exposant publique = %Zx\n\nN = %Zx\n\n",c,e,n);
 				est_egale(m,m_obtenu);
 				break;
 		case 3:	generation_RSA(n,e,d,taille_bit,tab,k);
 				joye_ladder(sig,m,d,n);
 				joye_ladder(verif_sig,sig,e,n);
-				gmp_printf("E :exposant publique pour la vérification = %Zx\n\nmodulo (N) = %Zx\n\n",e,n);
+				gmp_printf("E : exposant publique pour la vérification = %Zx\n\nN = %Zx\n\n",e,n);
 				est_egale(verif_sig,m);
 				break;
 		case 4: generation_RSA_CRT(n,e,d_p,d_q,I_p,p,q,taille_bit,tab,k);
 				sign_CRT(sig,m,p,q,d_p,d_q,I_p,n);
 				joye_ladder(verif_sig,sig,e,n);
-				gmp_printf("E :exposant publique pour la vérification = %Zx\n\nmodulo (N) = %Zx\n\n",e,n);
+				gmp_printf("E : exposant publique pour la vérification = %Zx\n\nN = %Zx\n\n",e,n);
 				est_egale(verif_sig,m);
 				break;
 		default : printf("erreur de saisie !\n\n");break;
@@ -414,3 +416,5 @@ int main(int argc, char* argv[]){
 	mpz_clears(n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig,NULL);
 	return 0;
 }
+
+  
