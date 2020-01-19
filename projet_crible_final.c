@@ -1,4 +1,5 @@
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -372,13 +373,13 @@ int main(int argc, char* argv[]){
 		case 3:	generation_RSA(n,e,d,taille_bit,tab,k);
 				joye_ladder(sig,m,d,n);
 				joye_ladder(verif_sig,sig,e,n);
-				gmp_printf("E : exposant publique pour la vérification = %Zx\n\nN = %Zx\n\nsignature = %Zx",e,n,verif_sig);
+				gmp_printf("E : exposant publique pour la vérification = %Zx\n\nN = %Zx\n\nsignature = %Zx\n\n",e,n,verif_sig);
 				est_egale(verif_sig,m);
 				break;
 		case 4: generation_RSA_CRT(n,e,d_p,d_q,I_p,p,q,taille_bit,tab,k);
 				sign_CRT(sig,m,p,q,d_p,d_q,I_p,n);
 				joye_ladder(verif_sig,sig,e,n);
-				gmp_printf("E : exposant publique pour la vérification = %Zx\n\nN = %Zx\n\nsignature = %Zx",e,n,verif_sig);
+				gmp_printf("E : exposant publique pour la vérification = %Zx\n\nN = %Zx\n\nsignature = %Zx\n\n",e,n,verif_sig);
 				est_egale(verif_sig,m);
 				break;
 		default : printf("erreur de saisie !\n\n");break;
