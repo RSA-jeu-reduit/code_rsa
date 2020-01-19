@@ -307,6 +307,7 @@ int taille_N()
 		return Tn_int;
 }
 
+
 int main(int argc, char* argv[]){
 
 	mpz_t n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig;
@@ -323,26 +324,26 @@ int main(int argc, char* argv[]){
 	{
 		case 0: return 0;
 		case 1: generation_RSA(n,e,d,taille_bit);
-				encrypt_RSA(c,m,e,n);
-				decrypt_RSA(m_obtenu,c,d,n);
+				encrypt_rsa(c,m,e,n);
+				decrypt_rsa(m_obtenu,c,d,n);
 				gmp_printf("Cypher_text = %Zx\n\nE : exposant publique = %Zx\n\nN = %Zx\n\n",c,e,n);
 				est_egale(m,m_obtenu);
 				break;
 		case 2: generation_RSA_CRT(n,e,d_p,d_q,I_p,p,q,taille_bit);
-				encrypt_RSA(c,m,e,n);
+				encrypt_rsa(c,m,e,n);
 				decrypt_rsa_CRT(m_obtenu,c,d_p,d_q,I_p,p,q);
 				gmp_printf("Cypher_text = %Zx\n\nE : exposant publique = %Zx\n\nN = %Zx\n\n",c,e,n);
 				est_egale(m,m_obtenu);
 				break;
 		case 3:	generation_RSA(n,e,d,taille_bit);
 				sign(sig,m,d,n);
-				verif_sign(verif_sig,sig,e,n);
+				verif_sign(verif_sig,m,sig,e,n);
 				gmp_printf("E : exposant publique pour la vérification = %Zx\n\nN = %Zx\n\n",e,n);
 				est_egale(verif_sig,m);
 				break;
 		case 4: generation_RSA_CRT(n,e,d_p,d_q,I_p,p,q,taille_bit);
 				sign_CRT(sig,m,p,q,d_p,d_q,I_p,n);
-				verif_sign(verif_sig,sig,e,n);
+				verif_sign(verif_sig,m,sig,e,n);
 				gmp_printf("E : exposant publique pour la vérification = %Zx\n\nN = %Zx\n\n",e,n);
 				est_egale(verif_sig,m);
 				break;
@@ -352,5 +353,3 @@ int main(int argc, char* argv[]){
 	mpz_clears(n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig,NULL);
 	return 0;
 }
-
-  
