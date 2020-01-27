@@ -272,10 +272,10 @@ void generation_RSA_CRT(mpz_t n, mpz_t e, mpz_t d_p, mpz_t d_q, mpz_t I_p, mpz_t
 	invert(d_p,e,phip);
 	invert(d_q,e,phiq);
 	invert(I_p,p,q);
-	gmp_printf("p = %Zu\nq = %Zu\n\n",p,q);
+	/*gmp_printf("p = %Zu\nq = %Zu\n\n",p,q);
 	gmp_printf("n = 0x%Zx\n\n",n);
 	gmp_printf("d_p = 0x%Zx\nd_q = %Zu\n\n",d_p,d_q);
-	gmp_printf("I_p = 0x%Zx\n\n",I_p);
+	gmp_printf("I_p = 0x%Zx\n\n",I_p);*/
 	mpz_clears(phip,phiq,phi,NULL);
 }
 
