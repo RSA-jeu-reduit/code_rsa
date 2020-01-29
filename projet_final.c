@@ -323,28 +323,33 @@ int main(int argc, char* argv[]){
 
 	switch(choix)
 	{
-		case 0: return 0;
+			case 0: return 0;
 		case 1: generation_RSA(n,e,d,taille_bit);
-				encrypt_rsa(c,m,e,n);
-				decrypt_rsa(m_obtenu,c,d,n);
+				joye_ladder(c,m,e,n);
+				joye_ladder(m_obtenu,c,d,n);
+				gmp_printf("Cypher_text = 0x%Zx\n\nE : exposant publique = 0x%Zx\n\nN = 0x%Zx\n\n",c,e,n);
 				est_egale(m,m_obtenu);
 				break;
 		case 2: generation_RSA_CRT(n,e,d_p,d_q,I_p,p,q,taille_bit);
-				encrypt_rsa(c,m,e,n);
+				joye_ladder(c,m,e,n);
 				decrypt_rsa_CRT(m_obtenu,c,d_p,d_q,I_p,p,q);
+				gmp_printf("Cypher_text = 0x%Zx\n\nE : exposant publique = 0x%Zx\n\nN = 0x%Zx\n\n",c,e,n);
 				est_egale(m,m_obtenu);
 				break;
 		case 3:	generation_RSA(n,e,d,taille_bit);
-				sign(sig,m,d,n);
-				verif_sign(verif_sig,m,sig,e,n);
+				joye_ladder(sig,m,d,n);
+				joye_ladder(verif_sig,sig,e,n);
+				gmp_printf("E : exposant publique pour la vérification = 0x%Zx\n\nN = 0x%Zx\n\nsignature = 0x%Zx\n\n",e,n,verif_sig);
 				est_egale(verif_sig,m);
 				break;
 		case 4: generation_RSA_CRT(n,e,d_p,d_q,I_p,p,q,taille_bit);
 				sign_CRT(sig,m,p,q,d_p,d_q,I_p,n);
-				verif_sign(verif_sig,m,sig,e,n);
+				joye_ladder(verif_sig,sig,e,n);
+				gmp_printf("E : exposant publique pour la vérification = 0x%Zx\n\nN = 0x%Zx\n\nsignature = 0x%Zx\n\n",e,n,verif_sig);
 				est_egale(verif_sig,m);
 				break;
-		default : printf("erreur de saisie !\n\n");break;
+		default : printf("erreur de saisie !\n\n");
+				break;
 	}
 
 	mpz_clears(n,e,d,m,m_obtenu,c,p,q,d_p,d_q,I_p,sig,verif_sig,NULL);
