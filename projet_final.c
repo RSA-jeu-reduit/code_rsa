@@ -279,14 +279,15 @@ void sign_CRT(mpz_t sig_CRT, mpz_t m, mpz_t p, mpz_t q, mpz_t d_p, mpz_t d_q,mpz
 	gmp_printf("signature = %Zx\n\n",sig_CRT);
 	mpz_clears(m_p,m_q,s_p,s_q,NULL);
 }
+
 void messageATraiter(mpz_t m)
 {
-	int message;
+	
 	printf("Entrez le message à chiffrer ou signer\n\n");
-	scanf("%d",&message);
-	mpz_set_ui(m,message);
-	printf("\n");
+	gmp_scanf("%Zd",m);
+	gmp_printf("0x%Zx\n\n",m);
 }
+
 
 
 
