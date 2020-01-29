@@ -316,7 +316,7 @@ int main(int argc, char* argv[]){
 	int choix;
 	mpz_set_ui(e,65537);
 	messageATraiter(m);
-	printf("Tapez :\n1 une simulation du chiffrement RSA standard\n2 pour une simulation du chiffrement RSA CRT\n3 pour une simulation de la signature du message en standard\n4 pour une simulation de la signature du message en CRT\n\n");
+	printf("Tapez :\n1 pour une simulation du chiffrement RSA standard\n2 pour une simulation du chiffrement RSA CRT\n3 pour une simulation de la signature du message en standard\n4 pour une simulation de la signature du message en CRT\n\n");
 	scanf("%d",&choix);
 	printf("\n");
 	int taille_bit = taille_N();
