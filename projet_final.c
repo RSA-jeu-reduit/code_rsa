@@ -134,7 +134,7 @@ int test_miller_rabin(mpz_t n, int t){
 void est_egale(mpz_t m,mpz_t m_obtenu){
 	if (mpz_cmp (m_obtenu,m) == 0)
 	{
-		gmp_printf("égalité vérifiée %Zx = %Zx\n\n",m,m_obtenu);
+		gmp_printf("égalité vérifiée : m = 0x%Zx\n            m_obtenu = 0x%Zx\n",m,m_obtenu);
 	}
 	else
 	{
