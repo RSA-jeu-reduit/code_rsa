@@ -216,7 +216,7 @@ void generation_RSA_CRT(mpz_t n, mpz_t z_e, mpz_t d_p, mpz_t d_q, mpz_t I_p, mpz
 	mpz_clears(phip,phiq,phi,NULL);
 }
 
-void encrypt_rsa(mpz_t c, mpz_t m, mpz_t e, mpz_t n){//c = m^e (mod n)
+/*void encrypt_rsa(mpz_t c, mpz_t m, mpz_t e, mpz_t n){//c = m^e (mod n)
 	joye_ladder(c,m,e,n);
 	//mpz_powm(c,m,e,n);
 	gmp_printf("cypher = 0x%Zx\n\n",c);
@@ -226,7 +226,7 @@ void decrypt_rsa(mpz_t m, mpz_t c, mpz_t d, mpz_t n){//m = c^d (mod n)
 	joye_ladder(m,c,d,n);
 	//mpz_powm(m,c,d,n);
 	gmp_printf("m_obtenu = 0x%Zx\n",m);
-}
+}*/
 
 void decrypt_rsa_CRT(mpz_t m, mpz_t c, mpz_t d_p, mpz_t d_q, mpz_t I_p, mpz_t p, mpz_t q){
 	mpz_t m_p,m_q;
@@ -242,11 +242,11 @@ void decrypt_rsa_CRT(mpz_t m, mpz_t c, mpz_t d_p, mpz_t d_q, mpz_t I_p, mpz_t p,
 	mpz_clears(m_p,m_q,NULL);
 }
 
-void sign(mpz_t sig, mpz_t m, mpz_t d, mpz_t n)//sig=m^d (mod n)
+/*void sign(mpz_t sig, mpz_t m, mpz_t d, mpz_t n)//sig=m^d (mod n)
 {
 	joye_ladder(sig,m,d,n);
 	gmp_printf("signature = %Zx\n", sig);
-}
+}*/
 
 void verif_sign(mpz_t verif_sig, mpz_t m, mpz_t sig, mpz_t e, mpz_t n)//verif_sig = sig^e (mod n) = m
 {
